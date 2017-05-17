@@ -16,10 +16,7 @@ namespace RESTService
     // NOTE: In order to launch WCF Test Client for testing this service, please select Service1.svc or Service1.svc.cs at the Solution Explorer and start debugging.
     public class Service1 : IService1
     {
-        //JOBS
-
         private string ConnectionStr = "Server=tcp:myserverreeb.database.windows.net,1433;Initial Catalog=MyDB;Persist Security Info=False;User ID=isusnavi2005;Password=Alegria1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-
 
         public Job SetFinishedJob(DateTime curentTime)
         {
@@ -31,11 +28,8 @@ namespace RESTService
 
         public Notification GetLastNotification()
         {
-
-            Notification not = null;
-
+            Notification notif = null;
             const string selectLastNotification = "select * from Notification order by NotId desc";
-
             using (SqlConnection databaseConnection = new SqlConnection(ConnectionStr))
             {
                 databaseConnection.Open();
@@ -43,25 +37,15 @@ namespace RESTService
                 {
                     using (SqlDataReader reader = selectCommand.ExecuteReader())
                     {
-                        //if (reader.HasRows)
-                        //{
-                        bool any = reader.NextResult();
-                        if (any)
+                        if (reader.Read())
                         {
-                            not = ReadNotification(reader);
-                            return not;
+                            notif = ReadNotification(reader);
                         }
-                        return new Notification()
-                        {
-                            NotId = -7 ,
-                            NotDate = DateTime.Now
-                        };
+                        return notif;
                     }
                 }
-
             }
         }
-
 
         public int DeleteAllNotifications()
         {
@@ -72,14 +56,12 @@ namespace RESTService
                 using (SqlCommand deletenotif = new SqlCommand(deleteAllNotif, databaseConnection))
                 {
                     int rowsAffected = deletenotif.ExecuteNonQuery();
-
                     return rowsAffected;
                 }
             }
         }
 
-
-
+        //next iterations
         private Job GetLastJob()
         {
             Job job = null;
@@ -105,8 +87,6 @@ namespace RESTService
 
             }
         }
-
-
         private Job UpdateJob(Job j)
         {
             var jobId = j.JobId;
@@ -129,8 +109,6 @@ namespace RESTService
                 }
             }
         }
-
-
         private static Job ReadJob(SqlDataReader reader)
         {
             int jobId = reader.GetInt32(0);
@@ -147,8 +125,6 @@ namespace RESTService
             };
             return job;
         }
-
-
         private Notification ReadNotification(SqlDataReader reader)
         {
             int notId = reader.GetInt32(0);
